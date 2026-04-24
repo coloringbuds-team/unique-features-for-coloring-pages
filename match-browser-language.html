@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recognize and highlight the browser language - ColoringBuds</title>
+</head>
+<body>
+<div class="lang-menu" role="menu" style="display: grid;"><button type="button" class="lang-menu-close" aria-label="Close">✕</button>
+        <a href="https://coloringbuds.com/it/" data-code="IT" class=" active">
+            Italiano
+            <span class="lang-code">IT</span>
+        </a><a href="https://coloringbuds.com/en/" data-code="EN" class="browser-match">
+                English
+                <span class="lang-code">EN</span>
+            </a>
+            
+            <a href="https://coloringbuds.com/de/" data-code="DE" class="browser-match">
+                Deutsch
+                <span class="lang-code">DE</span>
+            </a>
+            <a href="https://coloringbuds.com/fr/" data-code="FR" class="">
+                Français
+                <span class="lang-code">FR</span>
+            </a>
+            <a href="https://coloringbuds.com/es/" data-code="ES" class="browser-match">
+                Español
+                <span class="lang-code">ES</span>
+            </a>
+            <a href="https://coloringbuds.com/pt/" data-code="PT" class="">
+                Português
+                <span class="lang-code">PT</span>
+            </a>
+            <a href="https://coloringbuds.com/nl/" data-code="NL" class="">
+                Nederlands
+                <span class="lang-code">NL</span>
+            </a>
+            <a href="https://coloringbuds.com/zh-hant/" data-code="ZH-HANT" class="">
+                中文
+                <span class="lang-code">ZH-HANT</span>
+            </a>
+            <a href="https://coloringbuds.com/ja/" data-code="JA" class="browser-match">
+                日本語
+                <span class="lang-code">JA</span>
+            </a>
+            <a href="https://coloringbuds.com/ko/" data-code="KO" class="">
+                한국어
+                <span class="lang-code">KO</span>
+            </a>
+            <a href="https://coloringbuds.com/ar/" data-code="AR" class="">
+                العربية
+                <span class="lang-code">AR</span>
+            </a>
+            <a href="https://coloringbuds.com/sv/" data-code="SV" class="">
+                Svenska
+                <span class="lang-code">SV</span>
+            </a>
+            <a href="https://coloringbuds.com/cs/" data-code="CS" class="">
+                Čeština
+                <span class="lang-code">CS</span>
+            </a>
+            <a href="https://coloringbuds.com/vi/" data-code="VI" class="browser-match">
+                Tiếng Việt
+                <span class="lang-code">VI</span>
+            </a>
+            <a href="https://coloringbuds.com/hu/" data-code="HU" class="">
+                Magyar
+                <span class="lang-code">HU</span>
+            </a>
+            <a href="https://coloringbuds.com/pl/" data-code="PL" class="">
+                Polski
+                <span class="lang-code">PL</span>
+            </a>
+            <a href="https://coloringbuds.com/fi/" data-code="FI" class="">
+                Suomi
+                <span class="lang-code">FI</span>
+            </a>
+            <a href="https://coloringbuds.com/da/" data-code="DA" class="">
+                Dansk
+                <span class="lang-code">DA</span>
+            </a>
+            <a href="https://coloringbuds.com/sk/" data-code="SK" class="">
+                Slovenčina
+                <span class="lang-code">SK</span>
+            </a>
+            <a href="https://coloringbuds.com/no/" data-code="NO" class="">
+                Norsk
+                <span class="lang-code">NO</span>
+            </a>
+            <a href="https://coloringbuds.com/th/" data-code="TH" class="">
+                ไทย
+                <span class="lang-code">TH</span>
+            </a>
+</div>
+<script>
+  (function () {
+        var menu = document.querySelector('.lang-menu');
+        if (!menu) return;
+
+        function openMenu() {
+            menu.style.display = 'grid';
+            document.body.classList.add('lang-menu-open');
+            
+            if (!menu.querySelector('.lang-menu-close')) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'lang-menu-close';
+                btn.setAttribute('aria-label', 'Close');
+                btn.innerHTML = '\u2715';
+                btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); closeMenu(); });
+                menu.insertBefore(btn, menu.firstChild);
+            }
+            document.addEventListener('keydown', escHandler);
+            
+            setTimeout(function () { document.addEventListener('click', outsideHandler); }, 0);
+        }
+
+        function closeMenu() {
+            menu.style.display = 'none';
+            document.body.classList.remove('lang-menu-open');
+            document.removeEventListener('keydown', escHandler);
+            document.removeEventListener('click', outsideHandler);
+        }
+
+        function escHandler(e) {
+            if (e.key === 'Escape' || e.keyCode === 27) closeMenu();
+        }
+
+        function outsideHandler(e) {
+            var trigger = document.querySelector('.lang-trigger');
+            if (menu.contains(e.target)) return;
+            if (trigger && trigger.contains(e.target)) return;
+            closeMenu();
+        }
+
+        window.toggleLang = function (ev) {
+            if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+            var hidden = menu.style.display === 'none' || menu.style.display === '';
+            if (hidden) openMenu(); else closeMenu();
+        };
+
+        var candidates = [];
+        if (navigator.languages && navigator.languages.length) {
+            for (var k = 0; k < navigator.languages.length; k++) candidates.push(navigator.languages[k]);
+        }
+        if (navigator.language) candidates.push(navigator.language);
+        if (navigator.userLanguage) candidates.push(navigator.userLanguage);
+        if (candidates.length === 0) return;
+
+        var prefixSet = [];
+        var seen = {};
+        for (var c = 0; c < candidates.length; c++) {
+            var raw = (candidates[c] || '').toUpperCase();
+            if (!raw) continue;
+            var p = raw.split('-')[0];
+            if (!seen[p]) { seen[p] = true; prefixSet.push(p); }
+            if (!seen[raw]) { seen[raw] = true; prefixSet.push(raw); }
+        }
+
+        var links = Array.prototype.slice.call(menu.querySelectorAll('a'));
+        var activeLink = menu.querySelector('a.active');
+        var matchedLinks = [];
+        var topMatchLink = null;
+        var topMatchRank = Infinity;
+
+        for (var i = 0; i < links.length; i++) {
+            var a = links[i];
+            if (a === activeLink) continue;
+            var code = (a.getAttribute('data-code') || '').toUpperCase();
+            if (!code) continue;
+            var codePrefix = code.split('-')[0];
+            var rank = -1;
+            for (var j = 0; j < prefixSet.length; j++) {
+                var ps = prefixSet[j];
+                if (code === ps || codePrefix === ps || code === ps.split('-')[0]) {
+                    rank = j;
+                    break;
+                }
+            }
+            if (rank >= 0) {
+                matchedLinks.push(a);
+                if (rank < topMatchRank) { topMatchRank = rank; topMatchLink = a; }
+            }
+        }
+
+        matchedLinks.forEach(function (a) { a.classList.add('browser-match'); });
+
+        if (topMatchLink && activeLink && activeLink.nextSibling !== topMatchLink) {
+            activeLink.parentNode.insertBefore(topMatchLink, activeLink.nextSibling);
+        }
+    })();
+</script>
+</body>
+</html>
